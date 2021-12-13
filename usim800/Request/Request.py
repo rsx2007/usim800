@@ -67,21 +67,28 @@ class request(communicate):
 
         cmd = 'AT + HTTPPARA="URL","{}"'.format(url)
         self._send_cmd(cmd)
-        time.sleep(3)
         cmd = "AT +HTTPACTION=0"
-
         self._send_cmd(cmd)
-        time.sleep(2)
         cmd = "AT +HTTPREAD"
         self._send_cmd(cmd, get_decode_data=True)
+        time.sleep(4)
+        cmd = "AT +HTTPTERM"
         data = self._getdata(
-            data_to_decode=[], string_to_decode=None, till=b'\n', count=2, counter=0)
+            data_to_decode=[], string_to_decode=None, till=b'\n', count=3, counter=0)
+        #print(data)
         tk = Parser(data)
         token = tk.tokenizer()
+        
         self._content = tk.parser
-        if (len(token) == 4):
-            self._status_code = token[2]
-            read_bytes = token[3]
+        if (len(token) >= 4):
+            '''
+            if(int(token[4]) == 200):
+                self._status_code = 200
+                print("200!")
+                return 200
+            '''
+            self._status_code = token[4]
+            read_bytes = 29
             string = self._read_sent_data(int(read_bytes)+1000)
             tk = Parser(string)
 
